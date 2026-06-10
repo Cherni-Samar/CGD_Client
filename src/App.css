@@ -1,0 +1,3 @@
+/* App.css — vide, tout est géré par Tailwind + styles inline */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
