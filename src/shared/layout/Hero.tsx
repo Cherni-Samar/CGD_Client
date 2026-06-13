@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react'
-import { useTheme } from '../context/ThemeContext'
+import { useTheme } from '../../state/ThemeContext'
 
 const stats = [
   { num: '500+', label: 'Cars Detailed'     },

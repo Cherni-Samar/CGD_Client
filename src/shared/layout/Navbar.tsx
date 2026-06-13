@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { useTheme } from '../context/ThemeContext'
 import { Sun, Moon, Menu, X } from 'lucide-react'
+import { useTheme } from '../../state/ThemeContext'
 
 const links = [
   { label: 'Services',  href: '#services'  },

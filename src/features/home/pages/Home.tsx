@@ -1,11 +1,11 @@
-import Navbar      from '../components/Navbar'
-import Hero        from '../components/Hero'
+import Hero        from '../../../shared/layout/Hero'
 import Services    from '../components/Services'
 import Gallery     from '../components/Gallery'
 import WhyUs       from '../components/WhyUs'
 import Reviews     from '../components/Reviews'
-import BookingForm from '../components/BookingForm'
-import Footer      from '../components/Footer'
+import BookingForm from '../../booking/components/BookingForm'
+import Footer      from '../../../shared/layout/Footer'
+import Navbar from '../../../shared/layout/Navbar'
 
 export default function Home() {
   return (
