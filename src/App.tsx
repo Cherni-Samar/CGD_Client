@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import { ThemeProvider } from './context/ThemeContext'
-import Home from './pages/Home'
+import { ThemeProvider } from './state/ThemeContext'
+import Home from './features/home/pages/Home'
 import './App.css'
 
 function App() {

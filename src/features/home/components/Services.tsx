@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useTheme } from '../context/ThemeContext'
+import { useTheme } from '../../../state/ThemeContext'
 
 const services = [
   { icon: '✨', title: 'Exterior Detail',   desc: 'Full wash, clay bar, hand wax, tire dressing and streak-free glass polish.', price: 'From $149' },
