@@ -1,13 +1,16 @@
 export interface Quote {
-  _id?: string;
+    _id?: string;
 
-  firstName: string;
-  phone: string;
-  email: string;
+    firstName: string;
+    phone: string;
+    email: string;
 
-  city: string;
-  vehicleType: string;
-  service: string;
+    city: string;
+    vehicleType: string;
+    service: string;
 
-  status?: string;
+    status?: string;
+
+    date?: string;
+    time?: string;
 }
