@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { createQuote } from "../services/quoteService";
+import { createQuote, getAvailableSlots } from "../services/quoteService";
 import type { Quote } from "../types/quote";
 
 export const useQuote = () => {
@@ -7,17 +7,20 @@ export const useQuote = () => {
 
   const submitQuote = async (quote: Quote) => {
     setLoading(true);
-
     try {
-      const result = await createQuote(quote);
-      return result;
+      return await createQuote(quote);
     } finally {
       setLoading(false);
     }
   };
 
+  const fetchSlots = async (date: string) => {
+    return await getAvailableSlots(date);
+  };
+
   return {
     loading,
     submitQuote,
+    fetchSlots,
   };
 };

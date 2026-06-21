@@ -1,229 +1,253 @@
-import { useState } from 'react'
-import { useTheme } from '../../../state/ThemeContext'
-import { useQuote } from '../hooks/useQuote'
-import type { Quote } from '../types/quote'
+import { useState } from "react";
+import { useQuote } from "../hooks/useQuote";
+import { cities, vehicles, servicesList } from "../../../shared/constants/bookingData";
 
-import {
-  cities,
-  vehicles,
-  servicesList
-} from '../../../shared/constants/bookingData'
-
-import '../styles/bookingForm.css'
+import type { Quote } from "../types/quote";
+import "../styles/bookingForm.css";
 
 export default function BookingForm() {
-  const { isDark } = useTheme()
-  const { submitQuote, loading } = useQuote()
+  const { submitQuote, loading } = useQuote();
 
   const [form, setForm] = useState<Quote>({
-    firstName: '',
-    phone: '',
-    email: '',
+    firstName: "",
+    phone: "",
+    email: "",
     city: cities[0],
     vehicleType: vehicles[0],
     service: servicesList[0],
-    date: '',
-    time: '',
-  })
+    date: "",
+    time: "",
+  });
 
-  const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle')
+  const [slots, setSlots] = useState<string[]>([]);
+  const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
+  const [bookedSlots, setBookedSlots] = useState<string[]>([]);
 
-  const handle = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setForm(prev => ({
+  /* ---------------- INPUT ---------------- */
+  const handle = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    setForm((prev) => ({
       ...prev,
-      [e.target.name]: e.target.value
-    }))
-  }
+      [e.target.name]: e.target.value,
+    }));
+  };
 
+  /* ---------------- DATE (FIX BUG + FORMAT SAFE) ---------------- */
+  const handleDate = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+
+    setForm((prev) => ({
+      ...prev,
+      date: value,
+      time: "",
+    }));
+
+    generateSlots();
+  };
+
+  /* ---------------- SLOTS (CALENDLY STYLE) ---------------- */
+  const generateSlots = () => {
+    const arr: string[] = [];
+
+    for (let h = 9; h <= 17; h++) {
+      arr.push(`${h.toString().padStart(2, "0")}:00`);
+      arr.push(`${h.toString().padStart(2, "0")}:30`);
+    }
+
+    setSlots(arr);
+  };
+
+  /* ---------------- TIME SELECT ---------------- */
+  const selectTime = (time: string) => {
+    setForm((prev) => ({
+      ...prev,
+      time,
+    }));
+  };
+
+  /* ---------------- SUBMIT ---------------- */
   const submit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setStatus('idle')
+    e.preventDefault();
+    setStatus("idle");
 
     try {
-      await submitQuote(form)
-      setStatus('success')
+      await submitQuote(form);
+
+      setStatus("success");
 
       setForm({
-        firstName: '',
-        phone: '',
-        email: '',
+        firstName: "",
+        phone: "",
+        email: "",
         city: cities[0],
         vehicleType: vehicles[0],
         service: servicesList[0],
-        date: '',
-        time: ''
-      })
+        date: "",
+        time: "",
+      });
+
+      setSlots([]);
     } catch {
-      setStatus('error')
+      setStatus("error");
     }
-  }
-
-  const sectionBg = isDark ? 'transparent' : '#f0f4f8'
-
-  const containerBg = isDark
-    ? 'linear-gradient(135deg,rgba(14,34,53,.9),rgba(10,122,112,.12))'
-    : '#ffffff'
-
-  const inputStyle = {
-    background: isDark ? 'rgba(255,255,255,0.05)' : '#f4f9fa',
-    border: `1px solid ${isDark ? 'rgba(31,216,200,0.2)' : '#b8d8e0'}`,
-    color: isDark ? '#e6edf3' : '#0B1C2C'
-  }
+  };
 
   return (
-    <section
-      className="booking-section"
-      style={{ background: sectionBg }}
-    >
-      <div
-        className="booking-container"
-        style={{ background: containerBg }}
-      >
+    <section className="booking-section" id="booking">
 
-        {/* LEFT */}
+      <div className="booking-container">
+
+        {/* LEFT SIDE */}
         <div className="booking-left">
           <div className="tag">Book Online</div>
 
           <h2>
-            Get Your <span style={{ color: '#1FD8C8' }}>Free Quote</span>
+            Get Your <span className="highlight">Free Quote</span>
           </h2>
 
           <p>
-            Fill out the form and we'll reach out within 2 hours with a personalized quote.
+            Fill out the form and we will contact you within 2 hours.
           </p>
         </div>
 
-        {/* FORM */}
-        <form onSubmit={submit} className="booking-form">
+        {/* RIGHT SIDE */}
+        <div className="booking-right">
 
-          {/* 1ère ligne : nom + téléphone */}
-          <div className="row-2">
-            <input
-              className="input"
-              style={inputStyle}
-              name="firstName"
-              value={form.firstName}
-              onChange={handle}
-              placeholder="Full Name"
-              required
-            />
+          <form onSubmit={submit}>
 
-            <input
-              className="input"
-              style={inputStyle}
-              name="phone"
-              value={form.phone}
-              onChange={handle}
-              placeholder="Phone Number"
-              required
-            />
-          </div>
+            {/* NAME + PHONE */}
+            <div className="inputs-grid">
+              <input
+                className="pro-input"
+                name="firstName"
+                placeholder="Full Name"
+                value={form.firstName}
+                onChange={handle}
+                required
+              />
 
-          {/* 2ème ligne : email */}
-          <input
-            className="input"
-            style={inputStyle}
-            name="email"
-            type="email"
-            value={form.email}
-            onChange={handle}
-            placeholder="Email Address"
-            required
-          />
+              <input
+                className="pro-input"
+                name="phone"
+                placeholder="Phone Number"
+                value={form.phone}
+                onChange={handle}
+                required
+              />
+            </div>
 
-          {/* 3ème ligne : vehicle + service + city */}
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: '1fr 1fr 1fr',
-              gap: '1rem'
-            }}
-          >
-            <select
-              className="input"
-              style={inputStyle}
-              name="vehicleType"
-              value={form.vehicleType}
-              onChange={handle}
+            {/* EMAIL */}
+            <div className="inputs-grid">
+              <input
+                className="pro-input full"
+                name="email"
+                type="email"
+                placeholder="Email Address"
+                value={form.email}
+                onChange={handle}
+                required
+              />
+            </div>
+
+            {/* SELECTS */}
+            <div className="inputs-grid">
+
+              <select
+                className="pro-input"
+                name="vehicleType"
+                value={form.vehicleType}
+                onChange={handle}
+              >
+                {vehicles.map((v) => (
+                  <option key={v}>{v}</option>
+                ))}
+              </select>
+
+              <select
+                className="pro-input"
+                name="service"
+                value={form.service}
+                onChange={handle}
+              >
+                {servicesList.map((s) => (
+                  <option key={s}>{s}</option>
+                ))}
+              </select>
+
+              <select
+                className="pro-input"
+                name="city"
+                value={form.city}
+                onChange={handle}
+              >
+                {cities.map((c) => (
+                  <option key={c}>{c}</option>
+                ))}
+              </select>
+
+            </div>
+
+            {/* DATE */}
+            <div className="calendar-container">
+              <input
+                type="date"
+                className="pro-input"
+                name="date"
+                value={form.date}
+                onChange={handleDate}
+                required
+              />
+            </div>
+
+            {/* TIME SLOTS */}
+            {slots.length > 0 && (
+              <div className="time-slots">
+
+                <div className="slots-title">
+                  Choose Time
+                </div>
+
+                <div className="slots-grid">
+
+                  {slots.map((t) => (
+                    <button
+                      type="button"
+                      key={t}
+                      className={`time-slot ${
+                        form.time === t ? "selected" : ""
+                      }`}
+                      onClick={() => selectTime(t)}
+                    >
+                      {t}
+                    </button>
+                  ))}
+
+                </div>
+              </div>
+            )}
+
+            {/* BUTTON */}
+            <button
+              type="submit"
+              className="btn-pro"
+              disabled={loading || !form.time}
             >
-              {vehicles.map(v => (
-                <option key={v} value={v}>
-                  {v}
-                </option>
-              ))}
-            </select>
+              {loading ? "Sending..." : "→ Request My Free Quote"}
+            </button>
 
-            <select
-              className="input"
-              style={inputStyle}
-              name="service"
-              value={form.service}
-              onChange={handle}
-            >
-              {servicesList.map(s => (
-                <option key={s} value={s}>
-                  {s}
-                </option>
-              ))}
-            </select>
+            {/* STATUS */}
+            {status === "success" && (
+              <p className="status">✅ Sent successfully</p>
+            )}
 
-            <select
-              className="input"
-              style={inputStyle}
-              name="city"
-              value={form.city}
-              onChange={handle}
-            >
-              {cities.map(c => (
-                <option key={c} value={c}>
-                  {c}
-                </option>
-              ))}
-            </select>
-          </div>
+            {status === "error" && (
+              <p className="status">❌ Error sending request</p>
+            )}
 
-          {/* DATE + TIME */}
-          <div className="date-time-row">
-            <input
-              className="input"
-              style={inputStyle}
-              type="date"
-              name="date"
-              value={form.date}
-              onChange={handle}
-              required
-            />
-
-            <input
-              className="input"
-              style={inputStyle}
-              type="time"
-              name="time"
-              value={form.time}
-              onChange={handle}
-              required
-            />
-          </div>
-          {/* bouton */}
-          <button
-            className="btn-teal"
-            type="submit"
-            disabled={loading}
-          >
-            {loading ? 'Sending...' : '→ Request My Free Quote'}
-          </button>
-
-          {/* messages */}
-          {status === 'success' && (
-            <p className="success">✅ Quote sent successfully!</p>
-          )}
-
-          {status === 'error' && (
-            <p className="error">❌ Failed to send quote</p>
-          )}
-        </form>
-
+          </form>
+        </div>
       </div>
     </section>
-  )
+  );
 }
